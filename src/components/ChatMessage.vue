@@ -1,6 +1,6 @@
 <script setup>
 // prop : 부모가 자식에게 전달해주는 데이터
-import { ref, computed } from 'vue';
+// import { ref, computed } from 'vue';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko'
 
@@ -19,11 +19,11 @@ function formatDate(date) {
 
 <template>
   <template v-for="(msg, i) of props.messages" :key="msg.id">
-    <div :class="{ my: msg.username === currentUser }" class="msg">
+    <div :class="{ my: msg.username === props.currentUser }" class="msg">
       <div v-show="messages[i].username != messages[i - 1]?.username" class="name">{{ msg.username }}</div>
       <div class="chat" v-if="!msg.enter">
         <div class="text" @mouseenter="msg.isHover = true" @mouseleave="msg.isHover = false">{{ msg.content }}</div> 
-        <div class="time" v-show="msg.isHover">{{ formatDate(msg.time) }}</div>
+        <div class="time" v-show="msg.isHover">{{ formatDate(msg.createdAt) }}</div>
       </div>
       <div class="enter" v-if="msg.enter">{{ msg.enter }}</div>
     </div>
@@ -37,9 +37,9 @@ function formatDate(date) {
   display: flex;
   flex-direction: column;
   line-height: 170%; 
-  margin-bottom: 12px;
-  margin-left: 32px;
-  margin-right: 32px;
+  margin-top: 12px;
+  margin-left: 24px;
+  margin-right: 24px;
 }
 
 .name {
@@ -69,8 +69,11 @@ function formatDate(date) {
   text-align: center;
   padding: 5px;
   align-self: center;
-  width: 140px;
+  width: 152px;
   border-radius: 10px;
+  position: sticky;
+  bottom: 15px;
+  top: 15px;
 }
 
 .my {
