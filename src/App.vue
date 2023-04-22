@@ -75,12 +75,13 @@ function onSend() {
         const message = {
             username: username,
             content: input.value,
-            file: images.value,
+            filePaths: images.value,
             createdAt: String(Date.now()),
         };
 
         socket.emit('send message', message);
         input.value = '';
+        images.value = [];
     }
 }
 
@@ -114,7 +115,6 @@ const load = $state => {
     }
 };
 
-
 function onPaste(event) {
     const clipboardData = event.clipboardData || window.Clipboard;
     const items = clipboardData.items;
@@ -144,22 +144,10 @@ function onPaste(event) {
         <InfiniteLoading @infinite="load" target=".messages" :top="true" :firstload="false">
             <template #complete><div></div></template>
         </InfiniteLoading>
-        <template v-for="(msg, i) of messages" :key="msg.id">
-            <div :class="{ my: msg.username === username }" class="msg">
-                <div v-show="messages[i].username != messages[i - 1]?.username" class="name"> 
-                    {{ msg.username }}
-                </div>
-                <ChatMessage :content="msg.content" :time="msg.createdAt" :enter="msg.enter"/>
-            </div>
-        </template>
+        <ChatMessage :messages="messages" :currentUser="username"></ChatMessage>
     </div>
-
-    
     <div class="form">
-        
-        <div v-if="images.length != 0" class="image-container">
-            <InputImage v-for="img, i of images" :key="i" :url="img.url"></InputImage>
-        </div>
+        <InputImage :images="images" ></InputImage>
         <svg class="file-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
         <input class="file-input" type="file" accept="image/*" style="display: none;">
         
@@ -171,21 +159,16 @@ function onPaste(event) {
 
 <style>
 
-.image-container {
-    position: absolute;
-    bottom: 96px;
-    left: 16px;
-    background-color: #e7f0f4;
-    height: 150px;
-    max-width: 80vh;
-    border-radius: 20px;
-    flex-direction: row;
+.messages { 
+    width: 100%;
+    height: 0;
+    margin: 0; 
+    padding: 0; 
     display: flex;
-    align-items: center;
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    flex-direction: column;
+    overflow: auto;
+    background-color: #fff; 
+    flex-grow: 1; 
 }
 
 .form { 
@@ -197,60 +180,6 @@ function onPaste(event) {
     box-sizing: border-box; 
     background-color: #e7f0f4;
     border-radius: 20px;
-}
-
-.messages { 
-    width: 100%;
-    height: 0;
-    margin: 0; 
-    padding: 0; 
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    background-color: #fff; 
-    flex-grow: 3;  
-    /* scrollbar-width: none;
-    -ms-overflow-style: none; */
-}
-
-/* ( 크롬, 사파리, 오페라, 엣지 ) 동작 */
-.messages::-webkit-scrollbar {
-  display: none;
-}
-
-.messages > div { 
-    line-height: 170%; 
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 12px;
-    margin-left: 32px;
-    margin-right: 32px;
-}
-
-/* 내 메시지가 오른쪽에 나옴*/
-.messages .my {
-    align-items: flex-end;
-}
-
-.name {
-    color: #262f37;
-    margin-left: 6px;
-}
-
-.my .name {
-    margin-right: 3px;
-}
-
-/* 내 메시지는 시간, 메시지순으로 배치됨 */
-.messages .my .chat {
-    flex-direction: row-reverse;
-}
-
-/* 입장 메시지는 가욷데에 나옴 */
-.messages .enter {
-    margin: 15px 0 10px 0;
-    text-align: center;
-    font-size: 22px;
 }
 
 .file-btn {
@@ -279,7 +208,6 @@ path {
     padding: 0 16px 0 16px;
 }
 
-
 .input-btn { 
     height: 32px;
     width: 32px;
@@ -292,8 +220,5 @@ path {
 path {
     fill: #5e6e82;
 }
-
-
-
 
 </style>
